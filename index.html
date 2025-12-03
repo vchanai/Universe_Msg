@@ -1,0 +1,503 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message from the Universe</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;700&display=swap');
+
+        :root {
+            --bg-deep: #05020a;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #1f1135 0%, #000000 100%);
+            --accent-cyan: #00f2ff;
+            --accent-pink: #ff00aa;
+            --accent-gold: #ffd700;
+            --glass-surface: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --card-width: 320px;
+            --card-height: 520px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+            background: var(--bg-deep);
+            background-image: var(--bg-gradient);
+            font-family: 'Outfit', sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- PROCEDURAL STARS --- */
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle linear infinite;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: var(--brightness); transform: scale(1); box-shadow: 0 0 4px white; }
+            100% { opacity: 0; transform: scale(0.3); }
+        }
+
+        /* --- UI HEADER --- */
+        header {
+            position: absolute;
+            top: 30px;
+            text-align: center;
+            z-index: 20;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-weight: 200;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            font-size: 1.1rem;
+            /* Updated gradient to match the gold theme slightly better while keeping the vibe */
+            background: linear-gradient(90deg, #fff, var(--accent-gold), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        p.instruction {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 200;
+        }
+
+        /* --- 3D CARD CONTAINER --- */
+        .scene {
+            width: var(--card-width);
+            height: var(--card-height);
+            perspective: 1200px;
+            z-index: 10;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotateX(0); }
+            50% { transform: translateY(-20px) rotateX(2deg); }
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+            animation: none;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 30px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        /* --- CARD BACK (GOLDEN DESIGN) --- */
+        .face-back {
+            /* Golden Gradient Surface */
+            background: linear-gradient(135deg, #8a6e2f, #e3c472, #bf953f, #fcf6ba, #b38728);
+            background-size: 300% 300%;
+            animation: goldShimmer 8s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes goldShimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* White Lights Shining Effect */
+        .face-back::before {
+            content: '';
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            /* Bright white rotating light beam */
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.5), transparent 50%);
+            animation: rotateBg 12s linear infinite;
+            mix-blend-mode: overlay;
+        }
+
+        .geometry {
+            width: 140px;
+            height: 140px;
+            border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* White glow */
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .geometry::after {
+            content: '✦';
+            font-size: 3rem;
+            color: white;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
+        }
+
+        /* --- CARD FRONT (The Message) --- */
+        .face-front {
+            transform: rotateY(180deg);
+            background: rgba(20, 20, 30, 0.8);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.3); /* Subtle gold border */
+        }
+
+        /* Decorative glow inside front */
+        .face-front::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1), transparent 50%);
+            pointer-events: none;
+        }
+
+        .msg-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+            opacity: 0;
+            transform: scale(0.5);
+        }
+
+        .msg-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            opacity: 0;
+            transform: translateY(10px);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .msg-body {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            font-weight: 200;
+            color: rgba(255, 255, 255, 0.9);
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .msg-number {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 2px;
+        }
+
+        /* --- ANIMATIONS FOR TEXT REVEAL --- */
+        .card.flipped .msg-icon { animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 0.3s; }
+        .card.flipped .msg-title { animation: slideUp 0.6s ease forwards 0.4s; }
+        .card.flipped .msg-body { animation: slideUp 0.6s ease forwards 0.5s; }
+
+        @keyframes popIn { to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes rotateBg { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- BUTTON --- */
+        .btn-container {
+            position: absolute;
+            bottom: 50px;
+            z-index: 20;
+            height: 50px;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-family: 'Outfit', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+        }
+
+        button:hover {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            text-shadow: 0 0 5px white;
+            color: var(--accent-gold);
+        }
+
+        button.visible {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 480px) {
+            :root { --card-width: 85vw; --card-height: 60vh; }
+            h1 { font-size: 0.9rem; letter-spacing: 4px; }
+            .msg-body { font-size: 1rem; }
+        }
+    </style>
+<script src="https://puc.poecdn.net/authenticated_preview_page/syncedState.3f7572448765332f3047.js"></script></head>
+<body>
+
+    <div id="stars"></div>
+
+    <header>
+        <h1>Message from the universe</h1>
+        <p class="instruction">Tap the card to receive your message</p>
+    </header>
+
+    <div class="scene">
+        <div class="card" id="oracleCard" onclick="drawCard()">
+            <!-- BACK -->
+            <div class="card-face face-back">
+                <div class="geometry"></div>
+            </div>
+            <!-- FRONT -->
+            <div class="card-face face-front">
+                <div class="msg-icon" id="icon"></div>
+                <div class="msg-title" id="title"></div>
+                <div class="msg-body" id="message"></div>
+                <div class="msg-number" id="number"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-container">
+        <button id="resetBtn" onclick="resetCard()">New Message</button>
+    </div>
+
+    <script>
+        /* --- 1. STARFIELD GENERATOR --- */
+        function generateStars() {
+            const container = document.getElementById('stars');
+            const starCount = 150;
+            
+            for(let i=0; i<starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const size = Math.random() * 2.5;
+                const duration = 2 + Math.random() * 4;
+                const delay = Math.random() * 5;
+                const brightness = 0.4 + Math.random() * 0.6;
+
+                star.style.left = `${x}%`;
+                star.style.top = `${y}%`;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.animationDuration = `${duration}s`;
+                star.style.animationDelay = `${delay}s`;
+                star.style.setProperty('--brightness', brightness);
+                
+                container.appendChild(star);
+            }
+        }
+        generateStars();
+
+        /* --- 2. THE 100 CARDS DATA --- */
+        const deck = [
+            {i:"✨", t:"Infinite Potential", m:"You are not a drop in the ocean. You are the entire ocean in a drop."},
+            {i:"🪐", t:"Divine Timing", m:"The universe is never late. Trust the pause. The next chapter is worth the wait."},
+            {i:"🔥", t:"Inner Fire", m:"Your passion is your compass. Follow what lights you up, not what others expect."},
+            {i:"🌿", t:"Growth", m:"You are growing in ways you cannot yet see. Be patient with your roots."},
+            {i:"🌊", t:"Flow State", m:"Stop swimming upstream. Let go of control and let the current take you where you need to go."},
+            {i:"🔮", t:"Intuition", m:"That quiet whisper you hear? It's the truth. Listen to it before you ask for advice."},
+            {i:"🌑", t:"Shadow Work", m:"Do not fear your darkness. It is simply the place where your light has not yet touched."},
+            {i:"🦋", t:"Transformation", m:"You are shedding an old skin. It might feel uncomfortable, but wings are forming."},
+            {i:"🛸", t:"Perspective", m:"Zoom out. This problem is small when viewed from the stars."},
+            {i:"⚓", t:"Grounding", m:"Connect with the earth today. You need stability before you can fly higher."},
+            {i:"💫", t:"Manifestation", m:"Your thoughts are blueprints. Build carefully."},
+            {i:"❤️", t:"Self Love", m:"Treat yourself with the kindness you so freely give to others."},
+            {i:"🚪", t:"New Doors", m:"One door has closed so a better one can open. Don't stare at the lock."},
+            {i:"🛡️", t:"Boundaries", m:"Protect your energy. Saying 'no' is a complete sentence and a spiritual act."},
+            {i:"🌬️", t:"Release", m:"Exhale deeply. Let go of what is heavy. You don't need to carry it anymore."},
+            {i:"🧩", t:"Alignment", m:"When things feel easy, you are aligned. Follow the path of least resistance."},
+            {i:"🦁", t:"Courage", m:"Do it afraid. The fear won't go away, but the regret of not trying will stay forever."},
+            {i:"🤝", t:"Connection", m:"Reach out. Someone needs your light just as much as you need theirs."},
+            {i:"🎨", t:"Creativity", m:"You are a creator. Make something today, even if it's just a mess."},
+            {i:"⏳", t:"Patience", m:"A flower does not bloom in minutes. Give yourself time."},
+            {i:"🏔️", t:"Resilience", m:"You have survived 100% of your bad days. You are stronger than you know."},
+            {i:"🌌", t:"Expansion", m:"Your comfort zone is a cage. Step out and watch your universe expand."},
+            {i:"💡", t:"Clarity", m:"The answer is simple. You are overthinking it. Return to basics."},
+            {i:"🎁", t:"Gratitude", m:"Gratitude is the magnet for miracles. What are you thankful for right now?"},
+            {i:"🕊️", t:"Peace", m:"Peace is not the absence of chaos, but the calm within it."},
+            {i:"⚡", t:"Energy", m:"Check your battery. Are you draining yourself for people who don't recharge you?"},
+            {i:"🎯", t:"Focus", m:"Where attention goes, energy flows. Stop looking at the distraction."},
+            {i:"🌈", t:"Hope", m:"The storm is passing. Look for the color in the sky."},
+            {i:"🗝️", t:"Unlock", m:"You already hold the key. You just need to believe you are allowed to use it."},
+            {i:"🌙", t:"Rest", m:"Productivity is not your worth. Rest is productive. Sleep is sacred."},
+            {i:"🔭", t:"Vision", m:"Dream bigger. Your reality is limited only by your imagination."},
+            {i:"🎢", t:"Ride the Wave", m:"Ups and downs are natural. Don't scream on the rollercoaster; enjoy the ride."},
+            {i:"🧱", t:"Foundation", m:"Build on rock, not sand. Ensure your values are solid."},
+            {i:"🗣️", t:"Speak Up", m:"Your voice matters. Silence serves no one. Speak your truth."},
+            {i:"🧪", t:"Experiment", m:"Life is a laboratory. Try something new. There are no failures, only data."},
+            {i:"🌟", t:"Stardust", m:"You are made of carbon and magic. Act like it."},
+            {i:"🧭", t:"Direction", m:"If you feel lost, it's because you're exploring new territory. Keep walking."},
+            {i:"🩹", t:"Healing", m:"Healing is not linear. Be gentle with your setbacks."},
+            {i:"🎪", t:"Play", m:"You are taking life too seriously. Find the joy. Be silly."},
+            {i:"🔗", t:"Karma", m:"What you put out returns to you. Send out love today."},
+            {i:"🍇", t:"Abundance", m:"There is enough for everyone. Scarcity is an illusion."},
+            {i:"⚔️", t:"Warrior", m:"Fight for what you believe in, but choose your battles wisely."},
+            {i:"🕯️", t:"Lightworker", m:"You are here to light up the room. Don't dim your shine."},
+            {i:"🧬", t:"Ancestry", m:"You carry the strength of thousands who came before you."},
+            {i:"🚲", t:"Balance", m:"Life is like riding a bicycle. To keep your balance, you must keep moving."},
+            {i:"🌧️", t:"Cleansing", m:"Let the tears fall. They are washing away the dust from your soul."},
+            {i:"💎", t:"Value", m:"Know your worth. Then add tax."},
+            {i:"🚀", t:"Launch", m:"Prepare for liftoff. Your hard work is about to pay off."},
+            {i:"🧸", t:"Inner Child", m:"What did you love doing when you were 5? Do that today."},
+            {i:"📡", t:"Signal", m:"The universe is sending you signs. Pay attention to coincidences."},
+            {i:"🧲", t:"Attraction", m:"Be the person you want to attract."},
+            {i:"🏰", t:"Sanctuary", m:"Create a safe space for yourself. Your home is your temple."},
+            {i:"🚦", t:"Green Light", m:"This is your sign. Go for it."},
+            {i:"🛑", t:"Red Light", m:"Stop. Reassess. This is not the right path for you right now."},
+            {i:"🚧", t:"Detour", m:"The obstacle is the way. The detour will teach you something vital."},
+            {i:"🗺️", t:"Adventure", m:"Say yes to the unknown."},
+            {i:"🎭", t:"Authenticity", m:"Take off the mask. The world needs the real you."},
+            {i:"🧹", t:"Declutter", m:"Clear your space, clear your mind. Throw out what doesn't serve you."},
+            {i:"🍳", t:"Nourish", m:"Feed your body with life, feed your mind with truth."},
+            {i:"🏋️", t:"Strength", m:"You are stronger than you think. You can handle this."},
+            {i:"🤸", t:"Flexibility", m:"Blessed are the flexible, for they shall not be bent out of shape."},
+            {i:"👁️", t:"Awakening", m:"You are waking up to a higher truth. Don't go back to sleep."},
+            {i:"🤝", t:"Forgiveness", m:"Forgiveness is setting a prisoner free and realizing the prisoner was you."},
+            {i:"🥇", t:"Victory", m:"Success is near. Keep pushing."},
+            {i:"🧘", t:"Presence", m:"Be here now. The past is a ghost, the future is a dream."},
+            {i:"🎧", t:"Listen", m:"Listen more than you speak today. Wisdom is silent."},
+            {i:"🌲", t:"Nature", m:"Go outside. The trees have a message for you."},
+            {i:"💃", t:"Dance", m:"Move your body to shift your energy."},
+            {i:"🥂", t:"Celebrate", m:"Celebrate the small wins. They add up to the big ones."},
+            {i:"🔨", t:"Work", m:"Chop wood, carry water. Do the work without complaint."},
+            {i:"🌤️", t:"Optimism", m:"Choose to see the good. It's a revolutionary act."},
+            {i:"🐢", t:"Slow Down", m:"There is no race. You are exactly where you need to be."},
+            {i:"🦅", t:"Freedom", m:"Release the chains of other people's opinions."},
+            {i:"🎈", t:"Lightness", m:"Don't take things so personally. Let them float away."},
+            {i:"🔌", t:"Disconnect", m:"Unplug to reconnect. Turn off the screen."},
+            {i:"🧂", t:"Protection", m:"Create a circle of salt. Keep the bad vibes out."},
+            {i:"🏹", t:"Aim", m:"Be precise with your intention. What exactly do you want?"},
+            {i:"📖", t:"Story", m:"You are the author. If you don't like the chapter, write a new one."},
+            {i:"🧪", t:"Alchemy", m:"Turn your pain into power. Transmute the lead into gold."},
+            {i:"🧵", t:"Mending", m:"It is time to repair a broken relationship or a broken part of yourself."},
+            {i:"🍼", t:"Beginner", m:"Embrace the beginner's mind. Be willing to learn."},
+            {i:"👑", t:"Sovereignty", m:"You rule your own life. Take back the throne."},
+            {i:"🌤️", t:"Morning", m:"Start your day with intention. The morning sets the tone."},
+            {i:"🌙", t:"Evening", m:"End your day with gratitude. The night sets the dreams."},
+            {i:"🚂", t:"Momentum", m:"Once you start, it gets easier. Just take the first step."},
+            {i:"🧊", t:"Cool Down", m:"Anger is a hot coal. Drop it before it burns you."},
+            {i:"🔥", t:"Burn", m:"Burn the bridges that lead back to your old self."},
+            {i:"🧙", t:"Magic", m:"Believe in magic, and you will find it."},
+            {i:"🧚", t:"Miracle", m:"Expect a miracle today."},
+            {i:"🧬", t:"Evolution", m:"You are not the same person you were a year ago. Introduce yourself."},
+            {i:"🧼", t:"Clean Slate", m:"Today is a fresh start. The past does not define you."},
+            {i:"🗓️", t:"Plan", m:"A goal without a plan is just a wish."},
+            {i:"🎲", t:"Chance", m:"Take a risk. The odds are in your favor."},
+            {i:"💊", t:"Medicine", m:"Laughter is the best medicine. Find something funny."},
+            {i:"🧬", t:"DNA", m:"You are unique. There has never been another you."},
+            {i:"🌍", t:"World", m:"The world is your oyster. Go explore."},
+            {i:"🌌", t:"Cosmos", m:"The universe is conspiring in your favor."},
+            {i:"♾️", t:"Infinity", m:"Your potential is limitless."},
+            {i:"🏁", t:"Finish", m:"Finish what you started. Closure is important."},
+            {i:"❤️", t:"Love", m:"Love is the answer. Always."}
+        ];
+
+        /* --- 3. INTERACTION LOGIC --- */
+        let isFlipped = false;
+        const card = document.getElementById('oracleCard');
+        const btn = document.getElementById('resetBtn');
+        const iconEl = document.getElementById('icon');
+        const titleEl = document.getElementById('title');
+        const msgEl = document.getElementById('message');
+        const numEl = document.getElementById('number');
+
+        function drawCard() {
+            if (isFlipped) return;
+
+            // 1. Select Random Card
+            const randomIndex = Math.floor(Math.random() * deck.length);
+            const selected = deck[randomIndex];
+
+            // 2. Inject Content
+            iconEl.innerText = selected.i;
+            titleEl.innerText = selected.t;
+            msgEl.innerText = selected.m;
+            numEl.innerText = `CARD ${randomIndex + 1} / 100`;
+
+            // 3. Flip Animation
+            card.classList.add('flipped');
+            isFlipped = true;
+
+            // 4. Show Reset Button after delay
+            setTimeout(() => {
+                btn.classList.add('visible');
+            }, 1500);
+        }
+
+        function resetCard() {
+            // 1. Hide Button
+            btn.classList.remove('visible');
+            
+            // 2. Flip Back
+            card.classList.remove('flipped');
+            isFlipped = false;
+
+            // 3. Clear content after flip is hidden (so user doesn't see swap)
+            setTimeout(() => {
+                iconEl.innerText = "";
+                titleEl.innerText = "";
+                msgEl.innerText = "";
+                numEl.innerText = "";
+            }, 600);
+        }
+    </script>
+
+
+</body></html>
