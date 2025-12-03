@@ -55,11 +55,12 @@
         /* --- UI HEADER --- */
         header {
             position: absolute;
-            top: 5%; /* Changed from fixed pixels to % for better scaling */
+            top: 5%; 
             text-align: center;
             z-index: 20;
             width: 100%;
             padding: 0 20px;
+            pointer-events: none; /* Allows clicking through if stars are behind */
         }
 
         h1 {
@@ -86,8 +87,8 @@
             height: var(--card-height);
             perspective: 1200px;
             z-index: 10;
-            /* This pushes the card slightly up to make room for button */
-            margin-bottom: 40px; 
+            /* No margins here ensures true centering by flexbox */
+            margin: 0; 
         }
 
         .card {
@@ -102,7 +103,7 @@
 
         @keyframes float {
             0%, 100% { transform: translateY(0) rotateX(0); }
-            50% { transform: translateY(-15px) rotateX(2deg); } /* Reduced float height slightly */
+            50% { transform: translateY(-15px) rotateX(2deg); }
         }
 
         .card.flipped {
@@ -171,10 +172,10 @@
         /* --- CARD FRONT (The Message) --- */
         .face-front {
             transform: rotateY(180deg);
-            background: rgba(20, 20, 30, 0.85); /* Slightly darker for readability */
+            background: rgba(20, 20, 30, 0.85);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
-            padding: 30px 25px; /* Reduced padding slightly */
+            padding: 30px 25px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -221,7 +222,6 @@
             color: rgba(255, 255, 255, 0.9);
             opacity: 0;
             transform: translateY(10px);
-            /* Ensure text doesn't overflow */
             max-height: 60%;
             overflow-y: auto; 
         }
@@ -245,7 +245,7 @@
         /* --- BUTTON --- */
         .btn-container {
             position: absolute;
-            bottom: 8%; /* Using percentage for better responsiveness */
+            bottom: 8%;
             z-index: 30;
             height: 50px;
             width: 100%;
@@ -290,12 +290,11 @@
         @media (max-width: 480px) {
             :root { 
                 --card-width: 80vw; 
-                /* Reduce card height significantly on mobile to prevent overlap */
+                /* Adjusted height for mobile comfort */
                 --card-height: 50vh; 
             }
             
             body {
-                /* Ensure content is spaced out nicely */
                 justify-content: center;
             }
 
@@ -305,13 +304,16 @@
             }
             
             .scene {
-                /* Push the card up slightly */
-                margin-top: -20px;
-                margin-bottom: 60px; /* Add space below card for the button */
+                /* 
+                   1. Removed negative margins.
+                   2. Added slight positive top margin to visually balance 
+                      the card between the Header text and the Button area.
+                */
+                margin-top: 20px; 
+                margin-bottom: 0;
             }
 
             .btn-container {
-                /* Anchor button firmly at bottom but above safe area */
                 bottom: 40px; 
             }
 
@@ -323,7 +325,6 @@
         /* Small phone fix (iPhone SE etc) */
         @media (max-height: 670px) {
             :root { --card-height: 45vh; }
-            .scene { margin-bottom: 50px; }
         }
     </style>
 </head>
