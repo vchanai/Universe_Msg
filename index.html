@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Added maximum-scale to prevent zooming on double taps -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Message from the Universe</title>
     <style>
@@ -23,9 +22,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            /* CRITICAL FIX: Use dvh for mobile browsers */
             height: 100vh;
-            height: 100dvh; 
+            height: 100dvh; /* Dynamic Viewport Height for mobile browsers */
             width: 100vw;
             background: var(--bg-deep);
             background-image: var(--bg-gradient);
@@ -34,7 +32,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: center; /* Centers vertically */
             overflow: hidden;
             position: relative;
         }
@@ -57,7 +55,7 @@
         /* --- UI HEADER --- */
         header {
             position: absolute;
-            top: 30px; /* Safe distance from top */
+            top: 5%; /* Changed from fixed pixels to % for better scaling */
             text-align: center;
             z-index: 20;
             width: 100%;
@@ -88,8 +86,8 @@
             height: var(--card-height);
             perspective: 1200px;
             z-index: 10;
-            /* Ensure scene doesn't block clicks on button if they overlap */
-            pointer-events: none; 
+            /* This pushes the card slightly up to make room for button */
+            margin-bottom: 40px; 
         }
 
         .card {
@@ -100,12 +98,11 @@
             transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
             animation: float 6s ease-in-out infinite;
-            pointer-events: auto; /* Re-enable clicks on the card itself */
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0) rotateX(0); }
-            50% { transform: translateY(-20px) rotateX(2deg); }
+            50% { transform: translateY(-15px) rotateX(2deg); } /* Reduced float height slightly */
         }
 
         .card.flipped {
@@ -174,10 +171,10 @@
         /* --- CARD FRONT (The Message) --- */
         .face-front {
             transform: rotateY(180deg);
-            background: rgba(20, 20, 30, 0.8);
+            background: rgba(20, 20, 30, 0.85); /* Slightly darker for readability */
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
-            padding: 40px 30px;
+            padding: 30px 25px; /* Reduced padding slightly */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -199,37 +196,40 @@
 
         .msg-icon {
             font-size: 3.5rem;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
             opacity: 0;
             transform: scale(0.5);
         }
 
         .msg-title {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--accent-gold);
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             opacity: 0;
             transform: translateY(10px);
             text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
 
         .msg-body {
-            font-size: 1.1rem;
-            line-height: 1.6;
+            font-size: 1rem;
+            line-height: 1.5;
             font-weight: 200;
             color: rgba(255, 255, 255, 0.9);
             opacity: 0;
             transform: translateY(10px);
+            /* Ensure text doesn't overflow */
+            max-height: 60%;
+            overflow-y: auto; 
         }
 
         .msg-number {
             position: absolute;
             bottom: 20px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: rgba(255,255,255,0.3);
             letter-spacing: 2px;
         }
@@ -245,18 +245,17 @@
         /* --- BUTTON --- */
         .btn-container {
             position: absolute;
-            /* Raised from 50px to 80px to clear iPhone home bar */
-            bottom: 80px; 
-            z-index: 30; /* Increased Z-index to ensure it's on top */
+            bottom: 8%; /* Using percentage for better responsiveness */
+            z-index: 30;
             height: 50px;
             width: 100%;
             display: flex;
             justify-content: center;
-            pointer-events: none; /* Let clicks pass through container */
+            pointer-events: none;
         }
 
         button {
-            background: rgba(0,0,0,0.6); /* Added slight background for readability */
+            background: rgba(0,0,0,0.7);
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.4);
             color: white;
@@ -269,7 +268,7 @@
             cursor: pointer;
             transition: 0.3s;
             opacity: 0;
-            pointer-events: auto; /* Re-enable clicks on button */
+            pointer-events: auto;
             transform: translateY(20px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
@@ -279,7 +278,7 @@
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
             text-shadow: 0 0 5px white;
             color: var(--accent-gold);
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
         }
 
         button.visible {
@@ -287,20 +286,44 @@
             transform: translateY(0);
         }
 
-        /* Mobile adjustments */
+        /* --- MOBILE SPECIFIC FIXES --- */
         @media (max-width: 480px) {
             :root { 
-                --card-width: 85vw; 
-                /* Reduced height slightly to ensure room for button */
-                --card-height: 55vh; 
+                --card-width: 80vw; 
+                /* Reduce card height significantly on mobile to prevent overlap */
+                --card-height: 50vh; 
             }
-            h1 { font-size: 0.9rem; letter-spacing: 4px; }
-            .msg-body { font-size: 1rem; }
             
-            /* Ensure button is definitely visible on small screens */
-            .btn-container {
-                bottom: 12%; 
+            body {
+                /* Ensure content is spaced out nicely */
+                justify-content: center;
             }
+
+            h1 { 
+                font-size: 0.9rem; 
+                letter-spacing: 4px; 
+            }
+            
+            .scene {
+                /* Push the card up slightly */
+                margin-top: -20px;
+                margin-bottom: 60px; /* Add space below card for the button */
+            }
+
+            .btn-container {
+                /* Anchor button firmly at bottom but above safe area */
+                bottom: 40px; 
+            }
+
+            .msg-icon { font-size: 3rem; margin-bottom: 10px; }
+            .msg-title { font-size: 1.2rem; margin-bottom: 10px; }
+            .msg-body { font-size: 0.95rem; line-height: 1.4; }
+        }
+        
+        /* Small phone fix (iPhone SE etc) */
+        @media (max-height: 670px) {
+            :root { --card-height: 45vh; }
+            .scene { margin-bottom: 50px; }
         }
     </style>
 </head>
