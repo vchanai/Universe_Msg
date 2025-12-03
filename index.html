@@ -1,6 +1,9 @@
-<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Added maximum-scale to prevent zooming on double taps -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Message from the Universe</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;700&display=swap');
@@ -20,7 +23,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
+            /* CRITICAL FIX: Use dvh for mobile browsers */
             height: 100vh;
+            height: 100dvh; 
             width: 100vw;
             background: var(--bg-deep);
             background-image: var(--bg-gradient);
@@ -52,7 +57,7 @@
         /* --- UI HEADER --- */
         header {
             position: absolute;
-            top: 30px;
+            top: 30px; /* Safe distance from top */
             text-align: center;
             z-index: 20;
             width: 100%;
@@ -64,7 +69,6 @@
             text-transform: uppercase;
             letter-spacing: 6px;
             font-size: 1.1rem;
-            /* Updated gradient to match the gold theme slightly better while keeping the vibe */
             background: linear-gradient(90deg, #fff, var(--accent-gold), #fff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -84,6 +88,8 @@
             height: var(--card-height);
             perspective: 1200px;
             z-index: 10;
+            /* Ensure scene doesn't block clicks on button if they overlap */
+            pointer-events: none; 
         }
 
         .card {
@@ -94,6 +100,7 @@
             transition: transform 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
             animation: float 6s ease-in-out infinite;
+            pointer-events: auto; /* Re-enable clicks on the card itself */
         }
 
         @keyframes float {
@@ -119,7 +126,6 @@
 
         /* --- CARD BACK (GOLDEN DESIGN) --- */
         .face-back {
-            /* Golden Gradient Surface */
             background: linear-gradient(135deg, #8a6e2f, #e3c472, #bf953f, #fcf6ba, #b38728);
             background-size: 300% 300%;
             animation: goldShimmer 8s ease infinite;
@@ -134,13 +140,11 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* White Lights Shining Effect */
         .face-back::before {
             content: '';
             position: absolute;
             width: 150%;
             height: 150%;
-            /* Bright white rotating light beam */
             background: radial-gradient(circle, rgba(255, 255, 255, 0.5), transparent 50%);
             animation: rotateBg 12s linear infinite;
             mix-blend-mode: overlay;
@@ -155,7 +159,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* White glow */
             box-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(5px);
@@ -180,10 +183,9 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            border: 1px solid rgba(255, 215, 0, 0.3); /* Subtle gold border */
+            border: 1px solid rgba(255, 215, 0, 0.3);
         }
 
-        /* Decorative glow inside front */
         .face-front::before {
             content: '';
             position: absolute;
@@ -232,7 +234,6 @@
             letter-spacing: 2px;
         }
 
-        /* --- ANIMATIONS FOR TEXT REVEAL --- */
         .card.flipped .msg-icon { animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 0.3s; }
         .card.flipped .msg-title { animation: slideUp 0.6s ease forwards 0.4s; }
         .card.flipped .msg-body { animation: slideUp 0.6s ease forwards 0.5s; }
@@ -244,49 +245,65 @@
         /* --- BUTTON --- */
         .btn-container {
             position: absolute;
-            bottom: 50px;
-            z-index: 20;
+            /* Raised from 50px to 80px to clear iPhone home bar */
+            bottom: 80px; 
+            z-index: 30; /* Increased Z-index to ensure it's on top */
             height: 50px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            pointer-events: none; /* Let clicks pass through container */
         }
 
         button {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.6); /* Added slight background for readability */
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.4);
             color: white;
-            padding: 12px 30px;
+            padding: 14px 35px;
             border-radius: 50px;
             font-family: 'Outfit', sans-serif;
             text-transform: uppercase;
             letter-spacing: 2px;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: 0.3s;
             opacity: 0;
-            pointer-events: none;
+            pointer-events: auto; /* Re-enable clicks on button */
             transform: translateY(20px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         button:hover {
             border-color: var(--accent-gold);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
             text-shadow: 0 0 5px white;
             color: var(--accent-gold);
+            background: rgba(0,0,0,0.8);
         }
 
         button.visible {
             opacity: 1;
-            pointer-events: all;
             transform: translateY(0);
         }
 
         /* Mobile adjustments */
         @media (max-width: 480px) {
-            :root { --card-width: 85vw; --card-height: 60vh; }
+            :root { 
+                --card-width: 85vw; 
+                /* Reduced height slightly to ensure room for button */
+                --card-height: 55vh; 
+            }
             h1 { font-size: 0.9rem; letter-spacing: 4px; }
             .msg-body { font-size: 1rem; }
+            
+            /* Ensure button is definitely visible on small screens */
+            .btn-container {
+                bottom: 12%; 
+            }
         }
     </style>
-<script src="https://puc.poecdn.net/authenticated_preview_page/syncedState.3f7572448765332f3047.js"></script></head>
+</head>
 <body>
 
     <div id="stars"></div>
@@ -498,6 +515,5 @@
             }, 600);
         }
     </script>
-
-
-</body></html>
+</body>
+</html>
